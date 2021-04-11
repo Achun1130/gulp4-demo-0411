@@ -40,7 +40,9 @@ gulp.task('sass', () => (
   gulp.src('./src/scss/**/*.scss')
     .pipe($.plumber())
     .pipe($.sourcemaps.init())
-    .pipe($.sass().on('error', $.sass.logError))
+    .pipe($.sass({
+      includePaths: 'node_modules/bootstrap/scss',
+    }).on('error', $.sass.logError))
     .pipe($.postcss([autoprefixer()]))
     .pipe($.if(opts.env === 'production', $.cleanCss()))
     .pipe($.sourcemaps.write('.'))
