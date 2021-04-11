@@ -6,13 +6,13 @@ const { opts } = require('./opts');
 
 const bower = () => (
   gulp.src(mainBowerFiles())
-    .pipe(gulp.dest('./.tmp'))
+    .pipe(gulp.dest('./.tmp/vendors'))
 );
 
 const vendorJs = () => (
   gulp.src([
     './.tmp/**/*.js',
-    'node_modules/bootstrap/dist/js/bootstrap.bundle.js',
+    './node_modules/bootstrap/dist/js/bootstrap.bundle.js',
   ])
     .pipe($.concat('vendors.js'))
     .pipe($.if(opts.env === 'production', $.uglify()))
