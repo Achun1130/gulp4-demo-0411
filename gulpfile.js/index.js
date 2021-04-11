@@ -16,6 +16,7 @@ gulp.task('clean', () => (
     './dist',
   ],
   {
+    read: false,
     allowEmpty: true,
   })
     .pipe($.clean())
@@ -39,8 +40,8 @@ gulp.task('sass', () => (
   gulp.src('./src/scss/**/*.scss')
     .pipe($.plumber())
     .pipe($.sourcemaps.init())
-    .pipe($.postcss([autoprefixer()]))
     .pipe($.sass().on('error', $.sass.logError))
+    .pipe($.postcss([autoprefixer()]))
     .pipe($.if(opts.env === 'production', $.cleanCss()))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest('./dist/css'))
@@ -55,7 +56,11 @@ gulp.task('babel', () => (
       presets: ['@babel/env'],
     }))
     .pipe($.concat('all.js'))
-    .pipe($.if(opts.env === 'production', $.uglify()))
+    .pipe($.if(opts.env === 'production', $.uglify({
+      compress: {
+        drop_console: true,
+      },
+    })))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest('./dist/js'))
     .pipe(browserSync.stream())
@@ -63,8 +68,13 @@ gulp.task('babel', () => (
 
 gulp.task('imageMin', () => (
   gulp.src('./src/images/*')
-    .pipe($.imagemin())
+    .pipe($.if(opts.env === 'production', $.imagemin()))
     .pipe(gulp.dest('./dist/images'))
+));
+
+gulp.task('deploy', () => (
+  gulp.src('./dist/**/*')
+    .pipe($.ghPages())
 ));
 
 gulp.task('default',
@@ -76,11 +86,12 @@ gulp.task('default',
       'jade',
       'sass',
       'babel',
+      'imageMin',
     ),
     (done) => {
       browserSync.init({
         server: {
-          baseDir: './dist/',
+          baseDir: './dist',
         },
       });
 
