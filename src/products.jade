@@ -1,0 +1,19 @@
+extend _layout.jade
+
+block navbar
+  - const path = 'products.html'
+  include partials/_navbar.jade
+
+block content
+  .card-columns
+    each item, key in data
+      if key < 9
+        .card
+          img.card-img-top(
+            src=item.Picture1,
+            alt=item.Name
+          )
+          .card-body
+            h5.card-title #{ item.Name }
+            p.card-text
+              | #{ item.Description }
